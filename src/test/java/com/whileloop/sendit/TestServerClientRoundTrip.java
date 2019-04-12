@@ -26,7 +26,6 @@ package com.whileloop.sendit;
 import com.whileloop.sendit.callbacks.SClientCallback;
 import com.whileloop.sendit.callbacks.SServerCallback;
 import com.whileloop.sendit.client.SClient;
-import com.whileloop.sendit.messages.HeartBeatMessage;
 import com.whileloop.sendit.messages.SMessage;
 import com.whileloop.sendit.server.SServer;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -42,7 +41,7 @@ public class TestServerClientRoundTrip implements SServerCallback, SClientCallba
     SServer serverInstance;
     SClient clientInstance;
     SClient connectedClient;
-    HeartBeatMessage hbMsg;
+    TestHeartbeatMsg hbMsg;
 
     public TestServerClientRoundTrip() {
         this.clientInstance = null;
@@ -109,7 +108,7 @@ public class TestServerClientRoundTrip implements SServerCallback, SClientCallba
     public void OnMessage(SServer server, SClient client, SMessage msg) {
         assertEquals(connectedClient, client, "Connected client instances are different");
         assertEquals(serverInstance, server, "Server instances are different");
-        assertEquals(hbMsg.getCreationTime(), ((HeartBeatMessage) msg).getCreationTime());
+        assertEquals(hbMsg.getCreationTime(), ((TestHeartbeatMsg) msg).getCreationTime());
         client.Send(msg);
         client.closeConnection();
     }
@@ -155,7 +154,7 @@ public class TestServerClientRoundTrip implements SServerCallback, SClientCallba
     @Override
     public void OnMessage(SClient client, SMessage msg) {
         assertEquals(clientInstance, client, "Client instances are different");
-        assertEquals(hbMsg.getCreationTime(), ((HeartBeatMessage) msg).getCreationTime());
+        assertEquals(hbMsg.getCreationTime(), ((TestHeartbeatMsg) msg).getCreationTime());
     }
 
     @Override
@@ -173,7 +172,7 @@ public class TestServerClientRoundTrip implements SServerCallback, SClientCallba
         assertEquals(clientInstance, client, "Client instances are different");
         assertEquals(client.getCipherSuite(), clientInstance.getCipherSuite());
         assertEquals(client.getProtocol(), clientInstance.getProtocol());
-        this.hbMsg = new HeartBeatMessage();
+        this.hbMsg = new TestHeartbeatMsg();
         client.Send(hbMsg);
     }
 

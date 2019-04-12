@@ -25,19 +25,6 @@ package com.whileloop.sendit.messages;
 
 import java.io.Serializable;
 
-public class SMessage implements Serializable {
+public abstract class SMessage implements Serializable {
 
-    final SMessageType messageType;
-
-    public SMessage(SMessageType messageType) {
-        this.messageType = messageType;
-    }
-
-    public SMessageType getMessageType() {
-        return messageType;
-    }
-
-    public int getMessageId() {
-        return messageType.getMessageId();
-    }
 }

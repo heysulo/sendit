@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2019 Team whileLOOP.
+ * Copyright 2019 sulochana.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,20 +21,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.whileloop.sendit.messages;
+package com.whileloop.sendit;
 
-public enum SMessageType {
+import com.whileloop.sendit.messages.SMessage;
 
-    HEARTBEAT(0);
+/**
+ *
+ * @author sulochana
+ */
+public class TestHeartbeatMsg extends SMessage{
 
-    private final int messageId;
+    private final long creationTime;
 
-    private SMessageType(int messageId) {
-        this.messageId = messageId;
+    public TestHeartbeatMsg() {
+        this.creationTime = System.currentTimeMillis();
     }
 
-    public int getMessageId() {
-        return messageId;
+    public long getCreationTime() {
+        return creationTime;
     }
-
+    
 }
