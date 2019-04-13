@@ -34,7 +34,6 @@ import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslProvider;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
-import io.netty.handler.timeout.IdleStateHandler;
 
 /**
  *
@@ -59,7 +58,6 @@ public class SecureSServerChannelHandler extends ChannelInitializer<SocketChanne
 
         ChannelPipeline pipeline = ch.pipeline();
         pipeline.addLast(sslContext.newHandler(ch.alloc()));
-        pipeline.addLast(new IdleStateHandler(0, 0, 1));
         pipeline.addLast(new SMessageEncoder());
         pipeline.addLast(new SMessageDecoder());
         pipeline.addLast(new SServerHandler(this.targetServer));

@@ -29,6 +29,7 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.EventLoop;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.ssl.SslContext;
@@ -38,6 +39,7 @@ import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import java.net.InetSocketAddress;
+import java.util.UUID;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSession;
@@ -52,6 +54,7 @@ public class SClient {
     private Channel channel = null;
     private ChannelHandlerContext context = null;
     private SClient self = this;
+    private UUID attachedUuid = null;
 
     public SClient(String host, int port, EventLoopGroup eventLoopGroup, SClientCallback callback, boolean connectManually)
             throws SSLException, InterruptedException {
@@ -68,24 +71,24 @@ public class SClient {
         this.bootstrap.group(eventLoopGroup);
         this.bootstrap.channel(NioSocketChannel.class);
         this.bootstrap.handler(new SecureSClientChannelHandler(sslCtx, this));
-        if (connectManually){
+        if (connectManually) {
             return;
         }
         this._connect();
     }
-    
-    public final void connect() throws InterruptedException{
-        if (!this.manualConnect){
+
+    public final void connect() throws InterruptedException {
+        if (!this.manualConnect) {
             throw new RuntimeException("SClient not designed for manual connect");
         }
-        if (this.isConnected()){
+        if (this.isConnected()) {
             throw new RuntimeException("SClient already connected");
         }
-        
+
         _connect();
     }
-    
-    private void _connect() throws InterruptedException{
+
+    private void _connect() throws InterruptedException {
         ChannelFuture connection = this.bootstrap.connect(configuredHost, configuredPort);
         this.channel = connection.sync().channel();
         this.channel.pipeline().get(SslHandler.class).handshakeFuture().sync().addListener(new GenericFutureListener<Future<Channel>>() {
@@ -182,9 +185,25 @@ public class SClient {
         }
         return this.context.channel().isActive();
     }
-    
-    public void closeConnection(){
+
+    public void closeConnection() {
         this.context.channel().close();
+    }
+
+    public void attachUuid(UUID uuid) {
+        this.attachedUuid = uuid;
+    }
+
+    public UUID getAttachedUuid() {
+        return attachedUuid;
+    }
+
+    public EventLoop getEventLoop() {
+        if (this.channel != null) {
+            return this.channel.eventLoop();
+        }
+
+        return this.context.channel().eventLoop();
     }
 
 }

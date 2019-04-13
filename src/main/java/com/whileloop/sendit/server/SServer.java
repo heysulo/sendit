@@ -29,6 +29,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import java.security.cert.CertificateException;
 import javax.net.ssl.SSLException;
@@ -37,10 +38,12 @@ public class SServer {
 
     private final ServerBootstrap bootstrap;
     private final SServerCallback serverCallback;
+    private final NioEventLoopGroup clientEventGroup;
     private ChannelFuture completionFuture;
 
-    public SServer(int port, EventLoopGroup parentGroup, EventLoopGroup childGroup, SServerCallback callback) throws CertificateException, SSLException, InterruptedException {
-        serverCallback = callback;
+    public SServer(int port, EventLoopGroup parentGroup, NioEventLoopGroup childGroup, SServerCallback callback) throws CertificateException, SSLException, InterruptedException {
+        this.serverCallback = callback;
+        this.clientEventGroup = childGroup;
         this.bootstrap = new ServerBootstrap();
         this.bootstrap.group(parentGroup, childGroup);
         this.bootstrap.channel(NioServerSocketChannel.class);
@@ -60,8 +63,12 @@ public class SServer {
     public void closeServer() throws InterruptedException {
         this.completionFuture.channel().close().channel().closeFuture().sync();
     }
-    
-    public Channel getServerChannel(){
+
+    public Channel getServerChannel() {
         return this.completionFuture.channel();
+    }
+
+    public NioEventLoopGroup getClientEventGroup() {
+        return clientEventGroup;
     }
 }
